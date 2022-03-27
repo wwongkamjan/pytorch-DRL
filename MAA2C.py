@@ -190,10 +190,10 @@ class MAA2C(Agent):
 
     # predict softmax action based on state
     def _softmax_action(self, state):
-        state_var = to_tensor_var([state], self.use_cuda)
+        state_var = {agent_id: to_tensor_var([state[agent_id]], self.use_cuda) for agent_id in range(self.n_agents)}
         softmax_action = np.zeros((self.n_agents, self.action_dim), dtype=np.float64)
         for agent_id in range(self.n_agents):
-            softmax_action_var = th.exp(self.actors[agent_id](state_var[:,agent_id,:]))
+            softmax_action_var = th.exp(self.actors[agent_id](state_var[agent_id]))
             if self.use_cuda:
                 softmax_action[agent_id] = softmax_action_var.data.cpu().numpy()[0]
             else:
@@ -202,6 +202,7 @@ class MAA2C(Agent):
 
     # predict action based on state, added random noise for exploration in training
     def exploration_action(self, state):
+        # state = maa2c.env_state = env.reset = obs dict for each agent in ma
         softmax_action = self._softmax_action(state)
         actions = [0]*self.n_agents
         epsilon = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * \
