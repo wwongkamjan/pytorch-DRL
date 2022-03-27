@@ -44,12 +44,13 @@ RANDOM_SEED = 2017
 def run(env_id="CartPole-v0"):
 
     env = make_multi_agent(env_id)
+    print(type(env))
     # env.seed(RANDOM_SEED)
     env_eval = make_multi_agent(env_id)
     # env_eval.seed(RANDOM_SEED)
-    state_dim = env.observation_space().shape[0]
+    state_dim = env.observation_space.shape[0]
     if len(env.action_space.shape) > 1:
-        action_dim = env.action_space().shape[0]
+        action_dim = env.action_space.shape[0]
     else:
         action_dim = env.action_space().n
 
