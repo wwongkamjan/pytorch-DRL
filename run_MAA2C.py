@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import random
 
 import ray
-from ray.rllib.env.multi_agent_env import MultiAgentEnv, make_multi_agent
-# from ray.rllib.examples.env.multi_agent import MultiAgentCartPole
+# from ray.rllib.env.multi_agent_env import MultiAgentEnv, make_multi_agent
+from ray.rllib.examples.env.multi_agent import MultiAgentCartPole
 
 
 MAX_EPISODES = 5000
@@ -42,11 +42,10 @@ RANDOM_SEED = 2017
 
 
 def run(env_id="CartPole-v0"):
-
-    env = make_multi_agent(env_id)
-    print(env)
+    env = MultiAgentCartPole
+    # print(env)
     # env.seed(RANDOM_SEED)
-    env_eval = make_multi_agent(env_id)
+    env_eval = MultiAgentCartPole
     # env_eval.seed(RANDOM_SEED)
     state_dim = env.observation_space.shape[0]
     if len(env.action_space.shape) > 1:
