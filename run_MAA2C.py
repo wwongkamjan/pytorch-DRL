@@ -52,7 +52,7 @@ def run(env_id="CartPole-v0"):
     if len(env.action_space.shape) > 1:
         action_dim = env.action_space.shape[0]
     else:
-        action_dim = env.action_space().n
+        action_dim = env.action_space.n
 
     maa2c = MAA2C(env=env, n_agents=2, 
               state_dim=state_dim, action_dim=action_dim, memory_capacity=MEMORY_CAPACITY,
