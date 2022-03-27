@@ -212,7 +212,7 @@ class MAA2C(Agent):
                 actions[agent_id] = np.random.choice(self.action_dim)
             else:
                 actions[agent_id] = np.argmax(softmax_action[agent_id])
-        return actions
+        return {agent_id: actions[agent_id] for agent_id in range(self.n_agents)}
 
     # predict action based on state for execution
     def action(self, state):
