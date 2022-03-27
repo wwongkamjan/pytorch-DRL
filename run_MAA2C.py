@@ -43,7 +43,7 @@ RANDOM_SEED = 2017
 
 def run(env_id="CartPole-v0"):
     env = MultiAgentCartPole
-    # print(env)
+    print(env)
     # env.seed(RANDOM_SEED)
     env_eval = MultiAgentCartPole
     # env_eval.seed(RANDOM_SEED)
