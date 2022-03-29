@@ -170,7 +170,7 @@ class Agent(object):
             action = self.action(state)
             action_dict = {agent_id: action[agent_id] for agent_id in range(self.n_agents)}
             state, reward, done, info = env.step(action_dict)
-            next_state = self.agentdict_to_arr(next_state)
+            state = self.agentdict_to_arr(state)
             reward = self.agentdict_to_arr(reward)
             done = self.agentdict_to_arr(done)
             info = self.agentdict_to_arr(info)
@@ -181,7 +181,7 @@ class Agent(object):
                 action = self.action(state)
                 action_dict = {agent_id: action[agent_id] for agent_id in range(self.n_agents)}
                 state, reward, done, info = env.step(action_dict)
-                next_state = self.agentdict_to_arr(next_state)
+                state = self.agentdict_to_arr(state)
                 reward = self.agentdict_to_arr(reward)
                 done = self.agentdict_to_arr(done)
                 info = self.agentdict_to_arr(info)
