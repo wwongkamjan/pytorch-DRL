@@ -125,7 +125,7 @@ class MAA2C(Agent):
         for i in range(self.roll_out_n_steps):
             states.append(self.env_state)
             action = self.exploration_action(self.env_state)
-            print(action[0].shape)
+            # print(action[0].shape)
             # action from arr to dictionary
             action_dict = {agent_id: action[agent_id] for agent_id in range(self.n_agents)}
 
