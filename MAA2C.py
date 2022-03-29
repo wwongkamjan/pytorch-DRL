@@ -120,6 +120,18 @@ class MAA2C(Agent):
             states.append(self.env_state)
             action = self.exploration_action(self.env_state)
             next_state, reward, done, _ = self.env.step(action)
+            # next_state, reward, done return as a dictionary 
+            next_state_arr = []
+            reward_arr = []
+            done_arr = []
+            for i in range (self.n_agents):
+                next_state_arr.append(next_state[i])
+                reward_arr.append(reward[i])
+                done_arr.append(done[i])
+                
+            next_state = next_state_arr
+            reward = reward_arr
+            done_arr =done
             done = done[0]
             actions.append([index_to_one_hot(a, self.action_dim) for a in action])
             rewards.append(reward)
@@ -224,14 +236,14 @@ class MAA2C(Agent):
     def value(self, state, action):
         state_var = {agent_id: to_tensor_var([state[agent_id]], self.use_cuda) for agent_id in range(self.n_agents)}
         action_var = to_tensor_var([action], self.use_cuda)
-        # whole_state_var = state_var.view(-1, self.n_agents*self.state_dim)
-        # whole_action_var = action_var.view(-1, self.n_agents*self.action_dim)
+        whole_state_var = state_var.view(-1, self.n_agents*self.state_dim)
+        whole_action_var = action_var.view(-1, self.n_agents*self.action_dim)
         values = [0]*self.n_agents
         for agent_id in range(self.n_agents):
             if self.training_strategy == "cocurrent":
                 value_var = self.critics[agent_id](state_var[agent_id], action_var[:,agent_id,:])
-            # elif self.training_strategy == "centralized":
-            #     value_var = self.critics[agent_id](whole_state_var, whole_action_var)
+            elif self.training_strategy == "centralized":
+                value_var = self.critics[agent_id](whole_state_var, whole_action_var)
             if self.use_cuda:
                 values[agent_id] = value_var.data.cpu().numpy()[0]
             else:

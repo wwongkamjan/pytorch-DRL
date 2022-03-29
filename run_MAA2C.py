@@ -61,8 +61,8 @@ def run(env_id="CartPole-v0"):
               reward_gamma=REWARD_DISCOUNTED_GAMMA,
               epsilon_start=EPSILON_START, epsilon_end=EPSILON_END,
               epsilon_decay=EPSILON_DECAY, max_grad_norm=MAX_GRAD_NORM,
-              episodes_before_train=EPISODES_BEFORE_TRAIN,
-              critic_loss=CRITIC_LOSS, critic_parameter_sharing=True)
+              episodes_before_train=EPISODES_BEFORE_TRAIN, training_strategy="centralized",
+              critic_loss=CRITIC_LOSS, actor_parameter_sharing=True, critic_parameter_sharing=True)
 
     episodes =[]
     eval_rewards =[]
