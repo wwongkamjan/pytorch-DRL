@@ -58,9 +58,7 @@ def ma_agg_double_list(l):
     # l_i: result of each step in the i-th episode
     s = [np.sum(np.array(l_i), 1) for l_i in l]
 
-    # [...] = [[total_r1, total_r2, ..]] ; agent i  of episode ?
-    
-
-    s_mu = np.mean(np.array(s), 0)
-    s_std = np.std(np.array(s), 0)
+    # [...] = [total_r1, total_r2, ..] ; agent i  of li episode
+    s_mu = np.mean(np.array(s), 1)
+    s_std = np.std(np.array(s), 1)
     return s_mu, s_std
