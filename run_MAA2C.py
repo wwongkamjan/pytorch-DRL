@@ -14,8 +14,8 @@ from ray.rllib.env.multi_agent_env import MultiAgentEnv, make_multi_agent
 # from ray.rllib.examples.env.multi_agent import MultiAgentCartPole
 
 
-MAX_EPISODES = 5000
-EPISODES_BEFORE_TRAIN = 100
+MAX_EPISODES = 1000
+EPISODES_BEFORE_TRAIN = 10
 EVAL_EPISODES = 10
 EVAL_INTERVAL = 100
 
@@ -85,7 +85,7 @@ def run(env_id="CartPole-v0"):
 
     plt.figure()
     for agent_id in range (N_AGENTS):
-        plt.plot(episodes, eval_rewards[:,agent_id], label='agent '+agent_id)
+        plt.plot(episodes, eval_rewards[:,agent_id], label='agent '+str(agent_id))
     plt.title("%s"%env_id)
     plt.xlabel("Episode")
     plt.ylabel("Average Reward")
