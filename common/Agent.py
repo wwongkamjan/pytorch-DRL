@@ -166,17 +166,34 @@ class Agent(object):
             rewards_i = []
             infos_i = []
             state = env.reset()
+            state = self.agentdict_to_arr(state)
             action = self.action(state)
-            state, reward, done, info = env.step(action)
+            action_dict = {agent_id: action[agent_id] for agent_id in range(self.n_agents)}
+            state, reward, done, info = env.step(action_dict)
+            next_state = self.agentdict_to_arr(next_state)
+            reward = self.agentdict_to_arr(reward)
+            done = self.agentdict_to_arr(done)
+            info = self.agentdict_to_arr(info)
             done = done[0] if isinstance(done, list) else done
             rewards_i.append(reward)
             infos_i.append(info)
             while not done:
                 action = self.action(state)
-                state, reward, done, info = env.step(action)
+                action_dict = {agent_id: action[agent_id] for agent_id in range(self.n_agents)}
+                state, reward, done, info = env.step(action_dict)
+                next_state = self.agentdict_to_arr(next_state)
+                reward = self.agentdict_to_arr(reward)
+                done = self.agentdict_to_arr(done)
+                info = self.agentdict_to_arr(info)
                 done = done[0] if isinstance(done, list) else done
                 rewards_i.append(reward)
                 infos_i.append(info)
             rewards.append(rewards_i)
             infos.append(infos_i)
         return rewards, infos
+
+    def agentdict_to_arr(self, dct):
+        arr = []
+        for agent_id in range(self.n_agents):
+            arr.append(dct[agent_id])
+        return arr

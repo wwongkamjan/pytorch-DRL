@@ -251,8 +251,4 @@ class MAA2C(Agent):
             else:
                 values[agent_id] = value_var.data.numpy()[0]
         return values
-    def agentdict_to_arr(self, dct):
-        arr = []
-        for agent_id in range(self.n_agents):
-            arr.append(dct[agent_id])
-        return arr
+
