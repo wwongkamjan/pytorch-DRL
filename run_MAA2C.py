@@ -1,6 +1,6 @@
 
 from MAA2C import MAA2C
-from common.utils import agg_double_list
+from common.utils import ma_agg_double_list
 
 import sys
 import gym
@@ -72,7 +72,8 @@ def run(env_id="CartPole-v0"):
             maa2c.train()
         if maa2c.episode_done and ((maa2c.n_episodes+1)%EVAL_INTERVAL == 0):
             rewards, _ = maa2c.evaluation(env_eval, EVAL_EPISODES)
-            rewards_mu, rewards_std = agg_double_list(rewards)
+            print(np.array(rewards).shape)
+            rewards_mu, rewards_std = ma_agg_double_list(rewards)
             print("Episode %d, Average Reward %.2f" % (maa2c.n_episodes+1, rewards_mu))
             episodes.append(maa2c.n_episodes+1)
             eval_rewards.append(rewards_mu)
