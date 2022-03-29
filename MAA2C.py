@@ -110,8 +110,10 @@ class MAA2C(Agent):
     # agent interact with the environment to collect experience
     def interact(self):
         if (self.max_steps is not None) and (self.n_steps >= self.max_steps):
+            # env_state is dictionary
             self.env_state = self.env.reset()
-            self.n_steps = 0
+            # tranfrom from dict to arr
+            self.env_state = self.agentdict_to_arr(self.env_state)
         states = []
         actions = []
         rewards = []
@@ -120,18 +122,10 @@ class MAA2C(Agent):
             states.append(self.env_state)
             action = self.exploration_action(self.env_state)
             next_state, reward, done, _ = self.env.step(action)
-            # next_state, reward, done return as a dictionary 
-            next_state_arr = []
-            reward_arr = []
-            done_arr = []
-            for i in range (self.n_agents):
-                next_state_arr.append(next_state[i])
-                reward_arr.append(reward[i])
-                done_arr.append(done[i])
-                
-            next_state = next_state_arr
-            reward = reward_arr
-            done_arr =done
+            # next_state, reward, done return as a dictionary     
+            next_state = self.agentdict_to_arr(next_state)
+            reward = self.agentdict_to_arr(reward)
+            done =self.agentdict_to_arr(done)
             done = done[0]
             actions.append([index_to_one_hot(a, self.action_dim) for a in action])
             rewards.append(reward)
@@ -139,6 +133,7 @@ class MAA2C(Agent):
             self.env_state = next_state
             if done:
                 self.env_state = self.env.reset()
+                self.env_state = self.agentdict_to_arr(self.env_state)
                 break
         # discount reward
         if done:
@@ -202,10 +197,10 @@ class MAA2C(Agent):
 
     # predict softmax action based on state
     def _softmax_action(self, state):
-        state_var = {agent_id: to_tensor_var([state[agent_id]], self.use_cuda) for agent_id in range(self.n_agents)}
+        state_var = to_tensor_var([state], self.use_cuda)
         softmax_action = np.zeros((self.n_agents, self.action_dim), dtype=np.float64)
         for agent_id in range(self.n_agents):
-            softmax_action_var = th.exp(self.actors[agent_id](state_var[agent_id]))
+            softmax_action_var = th.exp(self.actors[agent_id](state_var[:,agent_id,:]))
             if self.use_cuda:
                 softmax_action[agent_id] = softmax_action_var.data.cpu().numpy()[0]
             else:
@@ -214,7 +209,6 @@ class MAA2C(Agent):
 
     # predict action based on state, added random noise for exploration in training
     def exploration_action(self, state):
-        # state = maa2c.env_state = env.reset = obs dict for each agent in ma
         softmax_action = self._softmax_action(state)
         actions = [0]*self.n_agents
         epsilon = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * \
@@ -224,7 +218,7 @@ class MAA2C(Agent):
                 actions[agent_id] = np.random.choice(self.action_dim)
             else:
                 actions[agent_id] = np.argmax(softmax_action[agent_id])
-        return {agent_id: actions[agent_id] for agent_id in range(self.n_agents)}
+        return actions
 
     # predict action based on state for execution
     def action(self, state):
@@ -234,7 +228,7 @@ class MAA2C(Agent):
 
     # evaluate value
     def value(self, state, action):
-        state_var = {agent_id: to_tensor_var([state[agent_id]], self.use_cuda) for agent_id in range(self.n_agents)}
+        state_var = to_tensor_var([state], self.use_cuda)
         action_var = to_tensor_var([action], self.use_cuda)
         whole_state_var = state_var.view(-1, self.n_agents*self.state_dim)
         whole_action_var = action_var.view(-1, self.n_agents*self.action_dim)
@@ -249,3 +243,8 @@ class MAA2C(Agent):
             else:
                 values[agent_id] = value_var.data.numpy()[0]
         return values
+    def agentdict_to_arr(self, dct):
+        arr = []
+        for agent_id in range(self.n_agents):
+            arr.append(dct[agent_id])
+        return arr
