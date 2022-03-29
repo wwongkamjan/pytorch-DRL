@@ -56,6 +56,7 @@ def agg_double_list(l):
 def ma_agg_double_list(l):
     # l: [ [...], [...], [...] ] where [...] = [[r11,r21, ...rij],[r12,r22,..rij]] ; agent i and step j
     # l_i: result of each step in the i-th episode
+    print(s)
     s = [np.sum(np.array(l_i), axis=1) for l_i in l]
 
     # [...] = [total_r1, total_r2, ..] ; agent i  of li episode
