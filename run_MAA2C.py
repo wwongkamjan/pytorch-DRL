@@ -74,7 +74,7 @@ def run(env_id="CartPole-v0"):
             rewards, _ = maa2c.evaluation(env_eval, EVAL_EPISODES)
             rewards_mu, rewards_std = ma_agg_double_list(rewards)
             for agent_id in range (N_AGENTS):
-                print("Episode %d, Agent %d, Average Reward %.2f" % (maa2c.n_episodes+1, i, rewards_mu[i]))
+                print("Episode %d, Agent %d, Average Reward %.2f" % (maa2c.n_episodes+1, agent_id, rewards_mu[agent_id]))
             episodes.append(maa2c.n_episodes+1)
             eval_rewards.append(rewards_mu)
 
