@@ -186,7 +186,6 @@ class Agent(object):
                 done = self.agentdict_to_arr(done)
                 info = self.agentdict_to_arr(info)
                 done = done[0] if isinstance(done, list) else done
-                print(reward)
                 rewards_i.append(reward)
                 infos_i.append(info)
             rewards.append(rewards_i)
