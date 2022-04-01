@@ -251,6 +251,11 @@ class MAA2C(Agent):
         actions = np.argmax(softmax_actions, axis=1)
         return actions
 
+    def actions(self, states):
+        softmax_actions = self._softmax_action(states)
+        actions = np.argmax(softmax_actions, axis=1)
+        return actions
+
     # evaluate value
     def value(self, state, action):
         state_var = to_tensor_var([state], self.use_cuda)
