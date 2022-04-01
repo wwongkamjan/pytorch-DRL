@@ -3,7 +3,6 @@ from MAA2C import MAA2C
 from common.utils import ma_agg_double_list
 
 import sys
-import gym
 import numpy as np
 import matplotlib.pyplot as plt
 

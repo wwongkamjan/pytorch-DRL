@@ -121,6 +121,7 @@ class MAA2C(Agent):
         states = []
         actions = []
         rewards = []
+        next_states = []
         # take n steps
         for i in range(self.roll_out_n_steps):
             states.append(self.env_state)
@@ -137,6 +138,7 @@ class MAA2C(Agent):
             done = done[0]
             actions.append([index_to_one_hot(a, self.action_dim) for a in action])
             rewards.append(reward)
+            next_states.append(next_state)
             final_state = next_state
             self.env_state = next_state
             if done:
@@ -159,7 +161,7 @@ class MAA2C(Agent):
             rewards[:,agent_id] = self._discount_reward(rewards[:,agent_id], final_r[agent_id])
         rewards = rewards.tolist()
         self.n_steps += 1
-        self.memory.push(states, actions, rewards)
+        self.memory.push(states, actions, rewards, next_state)
 
     # train on a roll out batch
     def train(self):
@@ -170,6 +172,7 @@ class MAA2C(Agent):
         states_var = to_tensor_var(batch.states, self.use_cuda).view(-1, self.n_agents, self.state_dim)
         actions_var = to_tensor_var(batch.actions, self.use_cuda).view(-1, self.n_agents, self.action_dim)
         rewards_var = to_tensor_var(batch.rewards, self.use_cuda).view(-1, self.n_agents, 1)
+        next_states_var = to_tensor_var(batch.next_states, self.use_cuda).view(-1, self.n_agents, self.state_dim)
         whole_states_var = states_var.view(-1, self.n_agents*self.state_dim)
         whole_actions_var = actions_var.view(-1, self.n_agents*self.action_dim)
 
@@ -193,7 +196,7 @@ class MAA2C(Agent):
 
             # update critic network
             self.critic_optimizers[agent_id].zero_grad()
-            target_values = rewards_var[:,agent_id,:]
+            target_values = rewards_var[:,agent_id,:] + self.reward_gamma * self.actors[agent_id](next_states_var[:,agent_id,:])
             if self.critic_loss == "huber":
                 critic_loss = nn.functional.smooth_l1_loss(values, target_values)
             else:
