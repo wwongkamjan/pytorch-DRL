@@ -259,7 +259,7 @@ class MAA2C(Agent):
         return actions
 
     def actions(self, states):
-        softmax_actions = self._softmax_action(states)
+        softmax_actions = self._softmax_actions(states)
         actions = np.argmax(softmax_actions, axis=1)
         return actions
 
