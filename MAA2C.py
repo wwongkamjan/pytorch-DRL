@@ -178,8 +178,8 @@ class MAA2C(Agent):
         whole_actions_var = actions_var.view(-1, self.n_agents*self.action_dim)
         whole_next_states_var = next_states_var.view(-1, self.n_agents*self.state_dim)
 
-        # print('states ', batch.states)
-        # print('next states ',batch.next_states)
+        print('states ', batch.states)
+        print('next states ',batch.next_states)
 
         for agent_id in range(self.n_agents):
             # update actor network
