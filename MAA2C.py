@@ -139,6 +139,8 @@ class MAA2C(Agent):
             actions.append([index_to_one_hot(a, self.action_dim) for a in action])
             rewards.append(reward)
             next_states.append(next_state)
+            print("state ", self.env_state)
+            print("next ", next_state)
             dones.append(done)
             final_state = next_state
             self.env_state = next_state
@@ -197,7 +199,9 @@ class MAA2C(Agent):
 
             # update critic network
             self.critic_optimizers[agent_id].zero_grad()
-            target_values = rewards_var[:,agent_id,:] + self.reward_gamma * self.actors[agent_id](next_states_var[:,agent_id,:])
+            q_value = 0
+                q_value =  self.reward_gamma * self.actors[agent_id](next_states_var[:,agent_id,:])
+            target_values = rewards_var[:,agent_id,:]
             if self.critic_loss == "huber":
                 critic_loss = nn.functional.smooth_l1_loss(values, target_values)
             else:
