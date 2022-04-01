@@ -197,7 +197,7 @@ class MAA2C(Agent):
 
             # update critic network
             self.critic_optimizers[agent_id].zero_grad()
-            q_values = self.critics[agent_id](next_states_var[:,agent_id,:], to_tensor_var(self.action(batch.states)))
+            q_values = self.critics[agent_id](next_states_var[:,agent_id,:], to_tensor_var(self.action(batch.next_states)))
             target_values = rewards_var[:,agent_id,:] + self.reward_gamma * q_values
             if self.critic_loss == "huber":
                 critic_loss = nn.functional.smooth_l1_loss(values, target_values)
@@ -219,6 +219,18 @@ class MAA2C(Agent):
             else:
                 softmax_action[agent_id] = softmax_action_var.data.numpy()[0]
         return softmax_action
+    
+    # predict softmax actions based on states
+    def _softmax_actions(self, states):
+        state_var = to_tensor_var(states, self.use_cuda).view(-1, self.n_agents, self.state_dim)
+        softmax_actions = np.zeros((len(states), self.n_agents, self.action_dim), dtype=np.float64)
+        for agent_id in range(self.n_agents):
+            softmax_action_var = th.exp(self.actors[agent_id](state_var[:,agent_id,:]))
+            if self.use_cuda:
+                softmax_actions[agent_id] = softmax_action_var.data.cpu().numpy()
+            else:
+                softmax_actions[agent_id] = softmax_action_var.data.numpy()
+        return softmax_actions
 
     # predict action based on state, added random noise for exploration in training
     def exploration_action(self, state):
