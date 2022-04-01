@@ -199,6 +199,8 @@ class MAA2C(Agent):
             # update critic network
             self.critic_optimizers[agent_id].zero_grad()
             argmax_actions = self.actions(batch.next_states)
+            print(batch.states)
+            print(batch.next_states)
             argmax_actions_var = to_tensor_var(argmax_actions, self.use_cuda).view(-1, self.n_agents, self.action_dim)
             whole_argmax_actions_var = argmax_actions_var.view(-1, self.n_agents*self.action_dim)
             q_values = self.critics[agent_id](whole_next_states_var, whole_argmax_actions_var)
