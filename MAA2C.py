@@ -142,12 +142,12 @@ class MAA2C(Agent):
             dones.append(done)
             final_state = next_state
             self.env_state = next_state
-            if done[0]:
+            if done.any():
                 self.env_state = self.env.reset()
                 self.env_state = self.agentdict_to_arr(self.env_state)
                 break
         # discount reward
-        if done[0]:
+        if done.any():
             final_r = [0.0] * self.n_agents
             self.n_episodes += 1
             self.episode_done = True
@@ -178,6 +178,9 @@ class MAA2C(Agent):
         whole_actions_var = actions_var.view(-1, self.n_agents*self.action_dim)
         whole_next_states_var = next_states_var.view(-1, self.n_agents*self.state_dim)
 
+        print('states ', batch.states)
+        print('next states ',batch.next_states)
+
         for agent_id in range(self.n_agents):
             # update actor network
             self.actor_optimizers[agent_id].zero_grad()
@@ -198,9 +201,8 @@ class MAA2C(Agent):
 
             # update critic network
             self.critic_optimizers[agent_id].zero_grad()
+            q_values = []
             argmax_actions = self.actions(batch.next_states)
-            print('states ', batch.states)
-            print('next_states ', batch.next_states)
             argmax_actions_var = to_tensor_var(argmax_actions, self.use_cuda).view(-1, self.n_agents, self.action_dim)
             whole_argmax_actions_var = argmax_actions_var.view(-1, self.n_agents*self.action_dim)
             q_values = self.critics[agent_id](whole_next_states_var, whole_argmax_actions_var)
