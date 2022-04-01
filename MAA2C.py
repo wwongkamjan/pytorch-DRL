@@ -134,6 +134,8 @@ class MAA2C(Agent):
             next_state, reward, done, _ = self.env.step(action_dict)
             # next_state, reward, done return as a dictionary     
             next_state = self.agentdict_to_arr(next_state)
+            print('state ',self.env_state)
+            print('next state ',next_state)
             reward = self.agentdict_to_arr(reward)
             done =self.agentdict_to_arr(done)
             actions.append([index_to_one_hot(a, self.action_dim) for a in action])
@@ -178,8 +180,8 @@ class MAA2C(Agent):
         whole_actions_var = actions_var.view(-1, self.n_agents*self.action_dim)
         whole_next_states_var = next_states_var.view(-1, self.n_agents*self.state_dim)
 
-        print('states ', batch.states)
-        print('next states ',batch.next_states)
+        # print('states ', batch.states)
+        # print('next states ',batch.next_states)
 
         for agent_id in range(self.n_agents):
             # update actor network
