@@ -176,6 +176,7 @@ class MAA2C(Agent):
         next_states_var = to_tensor_var(batch.next_states, self.use_cuda).view(-1, self.n_agents, self.state_dim)
         whole_states_var = states_var.view(-1, self.n_agents*self.state_dim)
         whole_actions_var = actions_var.view(-1, self.n_agents*self.action_dim)
+        whole_next_states_var = next_states_var.view(-1, self.n_agents*self.state_dim)
 
         for agent_id in range(self.n_agents):
             # update actor network
@@ -197,7 +198,10 @@ class MAA2C(Agent):
 
             # update critic network
             self.critic_optimizers[agent_id].zero_grad()
-            q_values = self.critics[agent_id](next_states_var[:,agent_id,:].view(-1, self.n_agents*self.state_dim), to_tensor_var(self.actions(batch.next_states), self.use_cuda).view(-1, self.n_agents, self.action_dim).view(-1, self.n_agents*self.action_dim))
+            argmax_actions = self.actions(batch.next_states)
+            argmax_actions_var = to_tensor_var(argmax_actions, self.use_cuda).view(-1, self.n_agents, self.action_dim)
+            whole_argmax_actions_var = argmax_actions_var.view(-1, self.n_agents*self.action_dim)
+            q_values = self.critics[agent_id](whole_next_states_var, whole_argmax_actions_var)
             target_values = rewards_var[:,agent_id,:] + self.reward_gamma * q_values
             if self.critic_loss == "huber":
                 critic_loss = nn.functional.smooth_l1_loss(values, target_values)
