@@ -229,10 +229,11 @@ class MAA2C(Agent):
     
     # predict softmax actions based on states
     def _softmax_actions(self, states):
-        state_var = to_tensor_var(states, self.use_cuda).view(-1, self.n_agents, self.state_dim)
+        states_var = to_tensor_var(states, self.use_cuda).view(-1, self.n_agents, self.state_dim)
         softmax_actions = np.zeros((self.n_agents,len(states), self.action_dim), dtype=np.float64)
         for agent_id in range(self.n_agents):
-            softmax_action_var = th.exp(self.actors[agent_id](state_var[:,agent_id,:]))
+            softmax_action_var = th.exp(self.actors[agent_id](states_var[:,agent_id,:]))
+            print(softmax_action_var.shape)
             if self.use_cuda:
                 softmax_actions[agent_id] = softmax_action_var.data.cpu().numpy()
             else:
