@@ -122,6 +122,7 @@ class MAA2C(Agent):
         actions = []
         rewards = []
         next_states = []
+        dones = []
         # take n steps
         for i in range(self.roll_out_n_steps):
             states.append(self.env_state)
@@ -135,18 +136,18 @@ class MAA2C(Agent):
             next_state = self.agentdict_to_arr(next_state)
             reward = self.agentdict_to_arr(reward)
             done =self.agentdict_to_arr(done)
-            done = done[0]
             actions.append([index_to_one_hot(a, self.action_dim) for a in action])
             rewards.append(reward)
             next_states.append(next_state)
+            dones.append(done)
             final_state = next_state
             self.env_state = next_state
-            if done:
+            if done[0]:
                 self.env_state = self.env.reset()
                 self.env_state = self.agentdict_to_arr(self.env_state)
                 break
         # discount reward
-        if done:
+        if done[0]:
             final_r = [0.0] * self.n_agents
             self.n_episodes += 1
             self.episode_done = True
@@ -161,7 +162,7 @@ class MAA2C(Agent):
             rewards[:,agent_id] = self._discount_reward(rewards[:,agent_id], final_r[agent_id])
         rewards = rewards.tolist()
         self.n_steps += 1
-        self.memory.push(states, actions, rewards, next_state)
+        self.memory.push(states, actions, rewards, next_state, dones)
 
     # train on a roll out batch
     def train(self):
