@@ -259,7 +259,9 @@ class MAA2C(Agent):
         return actions
 
     def actions(self, states):
+        print('states shape ',states.shape)
         softmax_actions = self._softmax_actions(states)
+        print('softmax_action shape ',softmax_actions.shape)
         actions = np.argmax(softmax_actions, axis=1)
         return actions
 
