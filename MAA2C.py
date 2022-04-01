@@ -134,8 +134,6 @@ class MAA2C(Agent):
             next_state, reward, done, _ = self.env.step(action_dict)
             # next_state, reward, done return as a dictionary     
             next_state = self.agentdict_to_arr(next_state)
-            print('state ',self.env_state)
-            print('next state ',next_state)
             reward = self.agentdict_to_arr(reward)
             done =self.agentdict_to_arr(done)
             actions.append([index_to_one_hot(a, self.action_dim) for a in action])
@@ -164,7 +162,7 @@ class MAA2C(Agent):
             rewards[:,agent_id] = self._discount_reward(rewards[:,agent_id], final_r[agent_id])
         rewards = rewards.tolist()
         self.n_steps += 1
-        self.memory.push(states, actions, rewards, next_state, dones)
+        self.memory.push(states, actions, rewards, next_states, dones)
 
     # train on a roll out batch
     def train(self):
@@ -203,7 +201,6 @@ class MAA2C(Agent):
 
             # update critic network
             self.critic_optimizers[agent_id].zero_grad()
-            q_values = []
             argmax_actions = self.actions(batch.next_states)
             argmax_actions_var = to_tensor_var(argmax_actions, self.use_cuda).view(-1, self.n_agents, self.action_dim)
             whole_argmax_actions_var = argmax_actions_var.view(-1, self.n_agents*self.action_dim)
