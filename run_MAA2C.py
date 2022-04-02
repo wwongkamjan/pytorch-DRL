@@ -13,7 +13,7 @@ from ray.rllib.env.multi_agent_env import MultiAgentEnv, make_multi_agent
 # from ray.rllib.examples.env.multi_agent import MultiAgentCartPole
 
 
-MAX_EPISODES = 1000
+MAX_EPISODES = 500
 EPISODES_BEFORE_TRAIN = 10
 EVAL_EPISODES = 10
 EVAL_INTERVAL = 100
