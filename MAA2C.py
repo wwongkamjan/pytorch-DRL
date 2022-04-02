@@ -201,8 +201,7 @@ class MAA2C(Agent):
 
             # update critic network
             self.critic_optimizers[agent_id].zero_grad()
-            argmax_actions = np.array([self.action(next_state) for next_state in batch.next_states])
-            print(argmax_actions.shape)
+            argmax_actions = [index_to_one_hot(a, self.action_dim) for next_state in batch.next_states for a in self.action(next_state)]
             argmax_actions_var = to_tensor_var(argmax_actions, self.use_cuda).view(-1, self.n_agents, self.action_dim)
             whole_argmax_actions_var = argmax_actions_var.view(-1, self.n_agents*self.action_dim)
             q_values = self.critics[agent_id](whole_next_states_var, whole_argmax_actions_var)
