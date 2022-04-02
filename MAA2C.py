@@ -166,6 +166,7 @@ class MAA2C(Agent):
 
     # train on a roll out batch
     def train(self):
+        test_s_prime =True
         if self.n_episodes <= self.episodes_before_train:
             pass
 
@@ -200,11 +201,15 @@ class MAA2C(Agent):
             self.actor_optimizers[agent_id].step()
 
             # update critic network
+
             self.critic_optimizers[agent_id].zero_grad()
-            argmax_actions = [index_to_one_hot(a, self.action_dim) for next_state in batch.next_states for a in self.action(next_state)]
-            argmax_actions_var = to_tensor_var(argmax_actions, self.use_cuda).view(-1, self.n_agents, self.action_dim)
-            whole_argmax_actions_var = argmax_actions_var.view(-1, self.n_agents*self.action_dim)
-            q_values = self.critics[agent_id](whole_next_states_var, whole_argmax_actions_var)
+            q_values = 0
+            if test_s_prime:
+                argmax_actions = [index_to_one_hot(a, self.action_dim) for next_state in batch.next_states for a in self.action(next_state)]
+                argmax_actions_var = to_tensor_var(argmax_actions, self.use_cuda).view(-1, self.n_agents, self.action_dim)
+                whole_argmax_actions_var = argmax_actions_var.view(-1, self.n_agents*self.action_dim)
+                q_values = self.critics[agent_id](whole_next_states_var, whole_argmax_actions_var)
+            
             target_values = rewards_var[:,agent_id,:] + self.reward_gamma * q_values
             if self.critic_loss == "huber":
                 critic_loss = nn.functional.smooth_l1_loss(values, target_values)
