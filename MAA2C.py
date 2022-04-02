@@ -201,7 +201,7 @@ class MAA2C(Agent):
 
             # update critic network
             self.critic_optimizers[agent_id].zero_grad()
-            argmax_actions = self.actions(batch.next_states[0])
+            argmax_actions = [self.action(next_state) for next_state in batch.next_states]
             argmax_actions_var = to_tensor_var(argmax_actions, self.use_cuda).view(-1, self.n_agents, self.action_dim)
             whole_argmax_actions_var = argmax_actions_var.view(-1, self.n_agents*self.action_dim)
             q_values = self.critics[agent_id](whole_next_states_var, whole_argmax_actions_var)
@@ -227,18 +227,6 @@ class MAA2C(Agent):
                 softmax_action[agent_id] = softmax_action_var.data.numpy()[0]
         return softmax_action
     
-    # predict softmax actions based on states
-    def _softmax_actions(self, states):
-        states_var = to_tensor_var(states, self.use_cuda).view(-1, self.n_agents, self.state_dim)
-        softmax_actions = np.zeros((self.n_agents,len(states), self.action_dim), dtype=np.float64)
-        for agent_id in range(self.n_agents):
-            softmax_action_var = th.exp(self.actors[agent_id](states_var[:,agent_id,:]))
-            print(softmax_action_var.shape)
-            if self.use_cuda:
-                softmax_actions[agent_id] = softmax_action_var.data.cpu().numpy()
-            else:
-                softmax_actions[agent_id] = softmax_action_var.data.numpy()
-        return softmax_actions
 
     # predict action based on state, added random noise for exploration in training
     def exploration_action(self, state):
@@ -259,12 +247,6 @@ class MAA2C(Agent):
         actions = np.argmax(softmax_actions, axis=1)
         return actions
 
-    def actions(self, states):
-        # print('states shape ',states.shape)
-        softmax_actions = self._softmax_actions(states)
-        print('softmax_action shape ',softmax_actions.shape)
-        actions = np.argmax(softmax_actions, axis=1)
-        return actions
 
     # evaluate value
     def value(self, state, action):
