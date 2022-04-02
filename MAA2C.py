@@ -121,8 +121,6 @@ class MAA2C(Agent):
         states = []
         actions = []
         rewards = []
-        next_states = []
-        dones = []
         # take n steps
         for i in range(self.roll_out_n_steps):
             states.append(self.env_state)
@@ -138,8 +136,7 @@ class MAA2C(Agent):
             done =self.agentdict_to_arr(done)
             actions.append([index_to_one_hot(a, self.action_dim) for a in action])
             rewards.append(reward)
-            # next_states.append(next_state)
-            dones.append(done)
+            # done = done[0]
             final_state = next_state
             self.env_state = next_state
             if done[0] or done[1]:
@@ -174,13 +171,8 @@ class MAA2C(Agent):
         states_var = to_tensor_var(batch.states, self.use_cuda).view(-1, self.n_agents, self.state_dim)
         actions_var = to_tensor_var(batch.actions, self.use_cuda).view(-1, self.n_agents, self.action_dim)
         rewards_var = to_tensor_var(batch.rewards, self.use_cuda).view(-1, self.n_agents, 1)
-        # next_states_var = to_tensor_var(batch.next_states, self.use_cuda).view(-1, self.n_agents, self.state_dim)
         whole_states_var = states_var.view(-1, self.n_agents*self.state_dim)
         whole_actions_var = actions_var.view(-1, self.n_agents*self.action_dim)
-        # whole_next_states_var = next_states_var.view(-1, self.n_agents*self.state_dim)
-
-        # print('states ', batch.states)
-        # print('next states ',batch.next_states)
 
         for agent_id in range(self.n_agents):
             # update actor network
@@ -203,14 +195,6 @@ class MAA2C(Agent):
             # update critic network
 
             self.critic_optimizers[agent_id].zero_grad()
-            # q_values = 0
-            # test_s_prime =True
-            # if test_s_prime:
-            #     argmax_actions = [index_to_one_hot(a, self.action_dim) for next_state in batch.next_states for a in self.action(next_state)]
-            #     argmax_actions_var = to_tensor_var(argmax_actions, self.use_cuda).view(-1, self.n_agents, self.action_dim)
-            #     whole_argmax_actions_var = argmax_actions_var.view(-1, self.n_agents*self.action_dim)
-            #     q_values = self.critics[agent_id](whole_next_states_var, whole_argmax_actions_var)
-            
             target_values = rewards_var[:,agent_id,:] 
             if self.critic_loss == "huber":
                 critic_loss = nn.functional.smooth_l1_loss(values, target_values)
