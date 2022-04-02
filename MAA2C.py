@@ -166,7 +166,7 @@ class MAA2C(Agent):
 
     # train on a roll out batch
     def train(self):
-        test_s_prime =True
+        
         if self.n_episodes <= self.episodes_before_train:
             pass
 
@@ -204,6 +204,7 @@ class MAA2C(Agent):
 
             self.critic_optimizers[agent_id].zero_grad()
             q_values = 0
+            test_s_prime =False
             if test_s_prime:
                 argmax_actions = [index_to_one_hot(a, self.action_dim) for next_state in batch.next_states for a in self.action(next_state)]
                 argmax_actions_var = to_tensor_var(argmax_actions, self.use_cuda).view(-1, self.n_agents, self.action_dim)
