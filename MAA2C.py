@@ -124,6 +124,7 @@ class MAA2C(Agent):
         # take n steps
         for i in range(self.roll_out_n_steps):
             states.append(self.env_state)
+            print(self.env_state)
             action = self.exploration_action(self.env_state)
             # print(action[0].shape)
             # action from arr to dictionary
