@@ -125,6 +125,7 @@ class MAA2C(Agent):
             action = self.exploration_action(self.env_state)
             # print(action[0].shape)
             # action from arr to dictionary
+            print('action: ', action)
             action_dict = {agent_id: action[agent_id] for agent_id in range(self.n_agents)}
 
             next_state, reward, done, _ = self.env.step(action_dict)
